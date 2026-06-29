@@ -85,9 +85,11 @@ OUTPUTLOCATION = Path(
 )
 
 renames = {
-    6248: "WhiteFox_Blue",
-    6298: "WhiteFox_Blue_JustAbilities",
+    6248: "WhiteFox",
+    6298: "WhiteFox_JustAbilities",
 }
+
+colour = "Blue"
 
 for chunk_id, new_name in renames.items():
 
@@ -97,7 +99,7 @@ for chunk_id, new_name in renames.items():
         print(f"Missing: {old_file.name}")
         continue
 
-    new_file = OUTPUTLOCATION / f"{new_name}_{chunk_id}-Windows.pak"
+    new_file = OUTPUTLOCATION / f"{new_name}_{colour}_{chunk_id}-Windows.pak"
 
     print(f"Renaming:")
     print(f"  {old_file.name}")
