@@ -11,6 +11,38 @@ PROJECT = r"C:\Users\Blake\Documents\Unreal Projects\Marvel\Marvel.uproject"
 PYTHON_SCRIPT = r"C:\Temp\test.py"
 ARCHIVE_DIR = r"C:\Builds\Marvel"
 
+OUTPUTLOCATION = Path(
+        r"C:\Builds\Marvel\Windows\Marvel\Content\Paks"
+)
+
+#The pack id and then the name to use infront (will keep the ID)
+renames = {
+    6248: "WhiteFox",
+    6298: "WhiteFox_JustAbilities",
+}
+#The asset we want.
+ASSETLOCATION = Path(
+    r"C:\Users\Blake\Documents\Unreal Projects\Marvel\Content\Marvel\UI\Textures\Ability\1060"
+)
+
+#All the colour options (Just copy past from auto colour lol.)
+colors = {
+        'red': (255, 0, 0),
+        'green': (0, 255, 0),
+        'blue': (0, 0, 255),
+        'yellow': (255, 255, 0),
+        'cyan': (0, 255, 255),
+        'magenta': (255, 0, 255),
+        'orange': (255, 157, 0),
+        'purple': (128, 0, 128),
+        'pink': (255, 192, 203),
+        'teal': (0, 128, 128),
+        'black': (0, 0, 0),
+        'lime':(204, 255, 0)
+    }
+
+
+
 
 def run_command(command):
     print("=" * 80)
@@ -80,14 +112,7 @@ def processThisColour(colour):
     # 3. Rename Cooked Packages
     # ----------------------------------------------------------------------
 
-    OUTPUTLOCATION = Path(
-        r"C:\Builds\Marvel\Windows\Marvel\Content\Paks"
-    )
 
-    renames = {
-        6248: "WhiteFox",
-        6298: "WhiteFox_JustAbilities",
-    }
 
 
     for chunk_id, new_name in renames.items():
@@ -112,23 +137,6 @@ def processThisColour(colour):
 #         file.unlink()
 
 # print("All files deleted.")
-colors = {
-        'red': (255, 0, 0),
-        'green': (0, 255, 0),
-        'blue': (0, 0, 255),
-        'yellow': (255, 255, 0),
-        'cyan': (0, 255, 255),
-        'magenta': (255, 0, 255),
-        'orange': (255, 157, 0),
-        'purple': (128, 0, 128),
-        'pink': (255, 192, 203),
-        'teal': (0, 128, 128),
-        'black': (0, 0, 0),
-    }
-
-ASSETLOCATION = Path(
-    r"C:\Users\Blake\Documents\Unreal Projects\Marvel\Content\Marvel\UI\Textures\Ability\1060"
-)
 
 
 for color_name in colors.keys():

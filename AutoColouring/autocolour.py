@@ -89,6 +89,7 @@ def process_all_colors(input_folder=".", output_folder="./colored"):
         'pink': (255, 192, 203),
         'teal': (0, 128, 128),
         'black': (0, 0, 0),
+        'lime':(204, 255, 0)
     }
     
     total_processed = 0
