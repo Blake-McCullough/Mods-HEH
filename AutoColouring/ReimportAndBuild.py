@@ -40,72 +40,71 @@ def run_command(command):
 
 
 
+def processThisColour(colour):
+
+    # ----------------------------------------------------------------------
+    # 1. Reimport assets
+    # ----------------------------------------------------------------------
+
+    run_command([
+        UE_CMD,
+        PROJECT,
+        f'-ExecutePythonScript={PYTHON_SCRIPT}',
+        '-unattended',
+        '-nop4',
+        '-log'
+    ])
+
+    # ----------------------------------------------------------------------
+    # 2. Cook/package project
+    # ----------------------------------------------------------------------
+
+    run_command([
+        UAT,
+        'BuildCookRun',
+        f'-project={PROJECT}',
+        '-noP4',
+        '-platform=Win64',
+        '-clientconfig=Shipping',
+        '-build',
+        '-cook',
+        '-stage',
+        '-pak',
+        '-archive',
+        f'-archivedirectory={ARCHIVE_DIR}',
+        '-utf8output',
+        '-log'
+    ])
+
+    # ----------------------------------------------------------------------
+    # 3. Rename Cooked Packages
+    # ----------------------------------------------------------------------
+
+    OUTPUTLOCATION = Path(
+        r"C:\Builds\Marvel\Windows\Marvel\Content\Paks"
+    )
+
+    renames = {
+        6248: "WhiteFox",
+        6298: "WhiteFox_JustAbilities",
+    }
 
 
-# ----------------------------------------------------------------------
-# 1. Reimport assets
-# ----------------------------------------------------------------------
+    for chunk_id, new_name in renames.items():
 
-run_command([
-    UE_CMD,
-    PROJECT,
-    f'-ExecutePythonScript={PYTHON_SCRIPT}',
-    '-unattended',
-    '-nop4',
-    '-log'
-])
+        old_file = OUTPUTLOCATION / f"pakchunk{chunk_id}-Windows.pak"
 
-# ----------------------------------------------------------------------
-# 2. Cook/package project
-# ----------------------------------------------------------------------
+        if not old_file.exists():
+            print(f"Missing: {old_file.name}")
+            continue
 
-run_command([
-    UAT,
-    'BuildCookRun',
-    f'-project={PROJECT}',
-    '-noP4',
-    '-platform=Win64',
-    '-clientconfig=Shipping',
-    '-build',
-    '-cook',
-    '-stage',
-    '-pak',
-    '-archive',
-    f'-archivedirectory={ARCHIVE_DIR}',
-    '-utf8output',
-    '-log'
-])
+        new_file = OUTPUTLOCATION / f"{new_name}_{colour}_{chunk_id}-Windows.pak"
 
-# ----------------------------------------------------------------------
-# 3. Rename Cooked Packages
-# ----------------------------------------------------------------------
+        print(f"Renaming:")
+        print(f"  {old_file.name}")
+        print(f"  -> {new_file.name}")
 
-OUTPUTLOCATION = Path(
-    r"C:\Builds\Marvel\Windows\Marvel\Content\Paks"
-)
-
-renames = {
-    6248: "WhiteFox",
-    6298: "WhiteFox_JustAbilities",
-}
-
-colour = "Blue"
-
-for chunk_id, new_name in renames.items():
-
-    old_file = OUTPUTLOCATION / f"pakchunk{chunk_id}-Windows.pak"
-
-    if not old_file.exists():
-        print(f"Missing: {old_file.name}")
-        continue
-
-    new_file = OUTPUTLOCATION / f"{new_name}_{colour}_{chunk_id}-Windows.pak"
-
-    print(f"Renaming:")
-    print(f"  {old_file.name}")
-    print(f"  -> {new_file.name}")
-
-    old_file.rename(new_file)
+        old_file.rename(new_file)
 
 # Clear the files
 # for file in OUTPUTLOCATION.iterdir():
@@ -113,6 +112,50 @@ for chunk_id, new_name in renames.items():
 #         file.unlink()
 
 # print("All files deleted.")
+colors = {
+        'red': (255, 0, 0),
+        'green': (0, 255, 0),
+        'blue': (0, 0, 255),
+        'yellow': (255, 255, 0),
+        'cyan': (0, 255, 255),
+        'magenta': (255, 0, 255),
+        'orange': (255, 157, 0),
+        'purple': (128, 0, 128),
+        'pink': (255, 192, 203),
+        'teal': (0, 128, 128),
+        'black': (0, 0, 0),
+    }
+
+ASSETLOCATION = Path(
+    r"C:\Users\Blake\Documents\Unreal Projects\Marvel\Content\Marvel\UI\Textures\Ability\1060"
+)
+
+
+for color_name in colors.keys():
+    print(f"Processing Colour: {color_name}")
+
+    source_folder = ASSETLOCATION / "colored" / color_name
+
+    if not source_folder.exists():
+        print(f"Missing folder: {source_folder}")
+        continue
+
+    for file in source_folder.iterdir():
+        if file.is_file():
+            destination = ASSETLOCATION / file.name
+
+            print(f"  Copying {file.name}")
+
+            # Overwrites existing file automatically
+            shutil.copy2(file, destination)
+    
+    print(f"Copied Out All For the Colour: {color_name}")
+
+    #Now we do the reimport and stuff.
+    processThisColour(color_name)
+
+    print(f"Processed the colour: {color_name}")
+
 
 
 print("\nDONE.")
