@@ -17,12 +17,12 @@ OUTPUTLOCATION = Path(
 
 #The pack id and then the name to use infront (will keep the ID)
 renames = {
-    6397: "BlackPanther",
-    6606: "BlackPanther_JustAbilities",
+    1014: "Punisher",
+    7014: "Punisher_JustAbilities",
 }
 #The asset we want.
 ASSETLOCATION = Path(
-    r"C:\Users\Blake\Documents\Unreal Projects\Marvel\Content\Marvel\UI\Textures\Ability\1026"
+    r"C:\Users\Blake\Documents\Unreal Projects\Marvel\Content\Marvel\UI\Textures\Ability\1014"
 )
 
         # fbx_file_path = import_data.get_first_filename()
