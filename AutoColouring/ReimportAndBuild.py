@@ -15,14 +15,15 @@ OUTPUTLOCATION = Path(
         r"C:\Builds\Marvel\Windows\Marvel\Content\Paks"
 )
 
+name = "Loki"
 #The pack id and then the name to use infront (will keep the ID)
 renames = {
-    1058: "Gambit",
-    7058: "Gambit_JustAbilities",
+    12: name,
+    14: name + "_JustAbilities",
 }
 #The asset we want.
 ASSETLOCATION = Path(
-    r"C:\Users\Blake\Documents\Unreal Projects\Marvel\Content\Marvel\UI\Textures\Ability\1058"
+    r"C:\Users\Blake\Documents\Unreal Projects\Marvel\Content\Marvel\UI\Textures\Ability\1016"
 )
 
         # fbx_file_path = import_data.get_first_filename()
