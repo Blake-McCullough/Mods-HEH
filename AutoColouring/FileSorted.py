@@ -2,7 +2,7 @@ from pathlib import Path
 import shutil
 
 # Folder containing the .pak files
-SOURCE_FOLDER = Path(r"C:\Users\Blake\Desktop\RivalsMods\UI Mods\With Just Abilities\Loki UI")
+SOURCE_FOLDER = Path(r"C:\Users\Blake\Desktop\RivalsMods\UI Mods\With Just Abilities\Jeff UI")
 
 colors = {
     'red': (255, 0, 0),
