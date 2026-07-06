@@ -2,7 +2,7 @@ from pathlib import Path
 import shutil
 
 # Folder containing the .pak files
-SOURCE_FOLDER = Path(r"C:\Users\Blake\Desktop\RivalsMods\UI Mods\With Just Abilities\Jeff UI")
+SOURCE_FOLDER = Path(r"C:\Users\Blake\Desktop\RivalsMods\UI Mods\With Just Abilities\Angela UI")
 
 colors = {
     'red': (255, 0, 0),
@@ -31,6 +31,7 @@ for file_path in SOURCE_FOLDER.iterdir():
     color_found = None
     for color in colors:
         if f"_{color}_" in filename:
+            
             color_found = color.capitalize()
             break
 
