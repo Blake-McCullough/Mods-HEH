@@ -1,10 +1,11 @@
 import unreal
 import re
+import os
 
-def create_individual_labels_for_textures():
+def create_labels_and_export():
     """
-    Creates individual PrimaryAssetLabel for each texture in the CollaborativeAbility/Icon folder.
-    Each label is named Label_{filename} and saved at /Game/
+    Creates individual PrimaryAssetLabel for each texture with sequential chunk IDs starting from 100.
+    Exports a file with chunk ID and filename.
     """
     asset_tools = unreal.AssetToolsHelpers.get_asset_tools()
     asset_library = unreal.EditorAssetLibrary()
@@ -15,6 +16,15 @@ def create_individual_labels_for_textures():
     # Where to save the labels (Content root)
     label_folder = "/Game"
     
+    # The additional asset that all labels need
+    additional_asset_path = "/Game/Marvel/Environment/NewYork/NewYorkE01/CustomProps/Tex/SM_NewYorkE01Component149M/T_NewYorkE01Component149M_02_D.T_NewYorkE01Component149M_02_D"
+    
+    # Output file path (saved in the project's Saved folder)
+    output_file = os.path.join(unreal.Paths.project_saved_dir(), "ChunkID_Export.txt")
+    
+    # Starting chunk ID
+    base_chunk_id = 100
+    
     # Load the PrimaryAssetLabel class
     label_class = unreal.load_class(None, "/Script/Engine.PrimaryAssetLabel")
     
@@ -22,7 +32,17 @@ def create_individual_labels_for_textures():
         unreal.log_error("Failed to load PrimaryAssetLabel class.")
         return None
     
-    # 1. Find all assets in the folder
+    # Load the additional asset once
+    unreal.log(f"Loading additional asset: {additional_asset_path}")
+    additional_asset = asset_library.load_asset(additional_asset_path)
+    
+    if not additional_asset:
+        unreal.log_error(f"Failed to load additional asset: {additional_asset_path}")
+        return None
+    
+    unreal.log(f"✓ Successfully loaded additional asset: {additional_asset.get_name()}")
+    
+    # Find all assets in the folder
     unreal.log(f"Scanning folder: {source_folder}")
     all_asset_paths = asset_library.list_assets(source_folder, recursive=False)
     
@@ -30,10 +50,9 @@ def create_individual_labels_for_textures():
         unreal.log_warning(f"No assets found in {source_folder}")
         return None
     
-    # Filter out existing label assets - only process texture assets
+    # Filter out existing label assets
     asset_paths = []
     for path in all_asset_paths:
-        # Extract the asset name
         path_parts = path.split('/')
         full_filename = path_parts[-1]
         if '.' in full_filename:
@@ -41,98 +60,78 @@ def create_individual_labels_for_textures():
         else:
             asset_name = full_filename
         
-        # Skip assets that are already labels (start with "Label_")
         if not asset_name.startswith("Label_"):
             asset_paths.append(path)
-        else:
-            unreal.log(f"Skipping existing label: {asset_name}")
     
     if not asset_paths:
-        unreal.log_warning(f"No texture assets found in {source_folder} (only labels exist)")
+        unreal.log_warning(f"No texture assets found in {source_folder}")
         return None
     
-    unreal.log(f"Found {len(asset_paths)} texture assets in the folder (skipped {len(all_asset_paths) - len(asset_paths)} existing labels)")
+    unreal.log(f"Found {len(asset_paths)} texture assets")
     
-    # Store created labels for reporting
     created_labels = []
+    output_lines = []
     
-    # 2. Process each asset individually
-    for asset_path in asset_paths:
+    # Add header to output
+    output_lines.append("chunkID | filename")
+    output_lines.append("-" * 50)
+    
+    # Process each asset with sequential chunk IDs
+    for index, asset_path in enumerate(asset_paths):
         try:
-            # Extract the asset name from the path
+            # Calculate chunk ID: start from 100 and increment by 1 for each asset
+            chunk_id = base_chunk_id + index
+            
             path_parts = asset_path.split('/')
             full_filename = path_parts[-1]
-            
             if '.' in full_filename:
                 asset_name = full_filename.split('.')[0]
             else:
                 asset_name = full_filename
             
-            unreal.log(f"Processing: {asset_name}")
-            
-            # Create label name: Label_{filename}
             label_name = f"Label_{asset_name}"
-            
-            # Load the source asset
             source_asset = asset_library.load_asset(asset_path)
+            
             if not source_asset:
-                unreal.log_warning(f"  Failed to load: {asset_path}")
                 continue
             
-            # Check if label already exists at /Game/ and delete it
+            # Delete existing label at /Game/
             existing_label_path = f"{label_folder}/{label_name}.{label_name}"
             if asset_library.does_asset_exist(existing_label_path):
-                unreal.log(f"  Deleting existing label at /Game/...")
                 asset_library.delete_asset(existing_label_path)
             
-            # Create the PrimaryAssetLabel at /Game/
+            # Create label at /Game/
             label_asset = asset_tools.create_asset(
                 asset_name=label_name,
-                package_path=label_folder,  # This is "/Game"
+                package_path=label_folder,
                 asset_class=label_class,
                 factory=unreal.DataAssetFactory()
             )
             
             if not label_asset:
-                unreal.log_error(f"  Failed to create label for {asset_name}")
                 continue
             
-            # Extract the number from the asset name for chunk ID
-            numbers = re.findall(r'\d+', asset_name)
-            if numbers:
-                chunk_id = int(numbers[0])
-            else:
-                chunk_id = 100000
+            # Set explicit assets with BOTH assets
+            label_asset.set_editor_property("explicit_assets", [source_asset, additional_asset])
             
-            # Set the explicit assets (this works)
-            label_asset.set_editor_property("explicit_assets", [source_asset])
-            
-            # Try to set the chunk ID with various property names
+            # Try to set chunk ID with various property names
             chunk_set = False
             for prop_name in ['ChunkID', 'chunk_id', 'ChunkId', 'chunkid', 'Chunk']:
                 try:
-                    # Try to get the property to see if it exists
-                    test = label_asset.get_editor_property(prop_name)
-                    # If we get here, the property exists, so set it
                     label_asset.set_editor_property(prop_name, chunk_id)
-                    unreal.log(f"  Set chunk ID using property: {prop_name} = {chunk_id}")
                     chunk_set = True
                     break
                 except:
                     continue
             
             if not chunk_set:
-                # Try using PrimaryAssetRules if it exists
                 try:
-                    # Check if the asset has a "rules" property
                     rules = label_asset.get_editor_property("rules")
                     if rules:
-                        # Try different property names on the rules object
                         for rule_prop in ['ChunkID', 'chunk_id', 'ChunkId']:
                             try:
                                 rules.set_editor_property(rule_prop, chunk_id)
                                 label_asset.set_editor_property("rules", rules)
-                                unreal.log(f"  Set chunk ID via rules.{rule_prop} = {chunk_id}")
                                 chunk_set = True
                                 break
                             except:
@@ -140,10 +139,7 @@ def create_individual_labels_for_textures():
                 except:
                     pass
             
-            if not chunk_set:
-                unreal.log_warning(f"  Could not set chunk ID for {asset_name}")
-            
-            # Set apply recursively (try different property names)
+            # Set apply recursively
             for prop_name in ['apply_recursively', 'ApplyRecursively', 'bApplyRecursively']:
                 try:
                     label_asset.set_editor_property(prop_name, False)
@@ -151,45 +147,69 @@ def create_individual_labels_for_textures():
                 except:
                     continue
             
-            # Save the label at /Game/
+            # Save the label
             asset_library.save_loaded_asset(label_asset)
             
             # Store for reporting
             created_labels.append({
                 'label_name': label_name,
-                'chunk_id': chunk_id if chunk_set else "NOT SET",
+                'chunk_id': chunk_id,
                 'source_asset': asset_name,
-                'location': label_folder
+                'additional_asset': additional_asset.get_name()
             })
             
-            unreal.log(f"  ✓ Created: {label_name} at /Game/ with Chunk ID: {chunk_id if chunk_set else 'NOT SET'}")
+            # Add to output lines for file
+            output_lines.append(f"{chunk_id} | {asset_name}")
+            
+            unreal.log(f"  [{index + 1}/{len(asset_paths)}] ✓ {label_name} → Chunk ID: {chunk_id}")
             
         except Exception as e:
             unreal.log_error(f"  Error processing {asset_path}: {str(e)}")
     
-    # 3. Print summary report
+    # Write output file
+    try:
+        with open(output_file, 'w') as f:
+            f.write('\n'.join(output_lines))
+        unreal.log(f"\n✓ Output file saved to: {output_file}")
+    except Exception as e:
+        unreal.log_error(f"Failed to write output file: {str(e)}")
+    
+    # Print summary report
     unreal.log("\n" + "=" * 80)
-    unreal.log("SUMMARY: Created Labels at /Game/ with Chunk IDs")
+    unreal.log("SUMMARY: Created Labels with Sequential Chunk IDs (starting from 100)")
     unreal.log("=" * 80)
     
     for label_info in created_labels:
-        chunk_display = str(label_info['chunk_id'])
-        unreal.log(f"  {label_info['label_name']:50} | Chunk ID: {chunk_display:10} | Contains: {label_info['source_asset']}")
+        unreal.log(f"  {label_info['label_name']:45} | Chunk ID: {label_info['chunk_id']:10}")
     
     unreal.log("=" * 80)
     unreal.log(f"Total labels created: {len(created_labels)}")
-    unreal.log(f"All labels saved at: /Game/")
+    unreal.log(f"Chunk ID range: {base_chunk_id} to {base_chunk_id + len(created_labels) - 1}")
+    unreal.log(f"Output file: {output_file}")
     unreal.log("=" * 80)
     
-    return created_labels
+    # Also print the output lines to the log for easy viewing
+    unreal.log("\n" + "=" * 80)
+    unreal.log("EXPORTED DATA (chunkID | filename):")
+    unreal.log("=" * 80)
+    for line in output_lines:
+        unreal.log(line)
+    unreal.log("=" * 80)
+    
+    return created_labels, output_file
 
 # --- Execute the script ---
 if __name__ == "__main__":
     unreal.log("=" * 50)
-    unreal.log("Creating individual labels for textures at /Game/...")
-    results = create_individual_labels_for_textures()
+    unreal.log("Creating individual labels with sequential chunk IDs...")
+    results, output_file = create_labels_and_export()
     if results:
-        unreal.log(f"\n✓ Process completed successfully! Created {len(results)} labels at /Game/")
+        unreal.log(f"\n✓ Process completed successfully!")
+        unreal.log(f"✓ Created {len(results)} labels at /Game/")
+        unreal.log(f"✓ Chunk IDs: 100 to {99 + len(results)}")
+        unreal.log(f"✓ Exported data to: {output_file}")
     else:
         unreal.log_error("\n✗ Process failed!")
     unreal.log("=" * 50)
+
+    #manually go and set the cook always, disable redirects, and priority 1
