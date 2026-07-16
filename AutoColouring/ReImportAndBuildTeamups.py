@@ -20,17 +20,12 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 if script_dir not in sys.path:
     sys.path.insert(0, script_dir)
 
-from SHAREDASSETS import COLORS
+from SHAREDASSETS import COLORS,ID_TO_NAME
 
-name = "ScarletWitch"
-#The pack id and then the name to use infront (will keep the ID)
-renames = {
-    12: name,
-    14: name + "_JustAbilities",
-}
+
 #The asset we want.
 ASSETLOCATION = Path(   
-    r"C:\Users\Blake\Documents\Unreal Projects\Marvel\Content\Marvel\UI\Textures\Ability\1038\Icon"
+    r"C:\Users\Blake\Documents\Unreal Projects\Marvel\Plugins\MarvelGAS\Content\Marvel\UI\Common\Textures\AbilityIcon"
 )
 
         # fbx_file_path = import_data.get_first_filename()
@@ -111,7 +106,7 @@ def processThisColour(colour):
 
 
 
-    for chunk_id, new_name in renames.items():
+    for chunk_id, new_name in ID_TO_NAME.items():
 
         old_file = OUTPUTLOCATION / f"pakchunk{chunk_id}-Windows.pak"
 
@@ -134,31 +129,45 @@ def processThisColour(colour):
 
 # print("All files deleted.")
 
+# Loop through each first-level folder in ASSETLOCATION (e.g., 1021, 1022, etc.)
+for asset_folder in ASSETLOCATION.iterdir():
+    if not asset_folder.is_dir():
+        continue
+    
+    asset_id = asset_folder.name
+    print(f"Processing Asset ID: {asset_id}")
 
-for color_name in COLORS.keys():
-    print(f"Processing Colour: {color_name}")
+    colored_folder = asset_folder / "colored"
 
-    source_folder = ASSETLOCATION / "colored" / color_name
-
-    if not source_folder.exists():
-        print(f"Missing folder: {source_folder}")
+    if not colored_folder.exists():
+        print(f"Missing folder: {colored_folder}")
         continue
 
-    for file in source_folder.iterdir():
-        if file.is_file():
-            destination = ASSETLOCATION / file.name
+    for color_name in COLORS.keys():
+        print(f"Processing Colour: {color_name}")
 
-            print(f"  Copying {file.name}")
+        source_folder = colored_folder / color_name
 
-            # Overwrites existing file automatically
-            shutil.copy2(file, destination)
-    
-    print(f"Copied Out All For the Colour: {color_name}")
+        if not source_folder.exists():
+            print(f"Missing folder: {source_folder}")
+            continue
 
-    #Now we do the reimport and stuff.
-    processThisColour(color_name)
+        for file in source_folder.iterdir():
+            if file.is_file():
+                destination = asset_folder / file.name
 
-    print(f"Processed the colour: {color_name}")
+                print(f"  Copying {file.name}")
+
+                # Overwrites existing file automatically
+                shutil.copy2(file, destination)
+        
+        print(f"Copied Out All For the Colour: {color_name}")
+
+        #Now we do the reimport and stuff.
+        processThisColour(color_name)
+
+        print(f"Processed the colour: {color_name}")
+
 
 
 
