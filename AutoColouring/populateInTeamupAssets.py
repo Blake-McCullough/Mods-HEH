@@ -2,26 +2,29 @@ import unreal
 import os
 import re
 from pathlib import Path
+import sys
 
+# Add the current script's directory to Python path
+script_dir = os.path.dirname(os.path.abspath(__file__))
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)
+
+from SHAREDASSETS import ID_TO_NAME
 # ============================================================================
 # CONFIGURATION - EDIT THIS DICTIONARY WITH YOUR FOLDER ID TO NAME MAPPING
 # ============================================================================
 # Format: "folder_id": "desired_label_name"
-FOLDER_ID_TO_NAME = {
-    "1023": "YourAbilityName1",
-    # Add all your folder IDs and their corresponding names here
-    # Example: "1023": "Fireball_Ability"
-}
+FOLDER_ID_TO_NAME =ID_TO_NAME
 
 # ============================================================================
 # CONFIGURATION - SOURCE AND DESTINATION PATHS
 # ============================================================================
 SOURCE_DIRECTORY = r"C:\Users\Blake\Documents\Unreal Projects\Marvel\Plugins\MarvelGAS\Content\Marvel\UI\Common\Textures\AbilityIcon"
-UNREAL_CONTENT_PATH = "/Game/Marvel/UI/Common/Textures/AbilityIcon"
+UNREAL_CONTENT_PATH = "/MarvelGAS/Marvel/UI/Common/Textures/AbilityIcon"
 LABEL_FOLDER= "/Game"
 
 # Additional asset to include in all labels (set to None if not needed)
-ADDITIONAL_ASSET_PATH = None  # Example: "/Game/Some/Path/To/Asset.Asset"
+ADDITIONAL_ASSET_PATH = "/Game/Marvel/Environment/NewYork/NewYorkE01/CustomProps/Tex/SM_NewYorkE01Component149M/T_NewYorkE01Component149M_02_D.T_NewYorkE01Component149M_02_D"  # Example: "/Game/Some/Path/To/Asset.Asset"
 
 # ============================================================================
 # HELPER FUNCTIONS

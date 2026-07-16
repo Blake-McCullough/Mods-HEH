@@ -1,23 +1,18 @@
 from pathlib import Path
 import shutil
+import sys
+import os
 
 # Folder containing the .pak files
 SOURCE_FOLDER = Path(r"C:\Users\Blake\Desktop\RivalsMods\UI Mods\With Just Abilities\ScarletWitch UI")
 
-colors = {
-    'red': (255, 0, 0),
-    'green': (0, 255, 0),
-    'blue': (0, 0, 255),
-    'yellow': (255, 255, 0),
-    'cyan': (0, 255, 255),
-    'magenta': (255, 0, 255),
-    'orange': (255, 157, 0),
-    'purple': (128, 0, 128),
-    'pink': (255, 192, 203),
-    'teal': (0, 128, 128),
-    'black': (0, 0, 0),
-    'lime': (204, 255, 0)
-}
+# Add the current script's directory to Python path
+script_dir = os.path.dirname(os.path.abspath(__file__))
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)
+
+from SHAREDASSETS import COLORS
+
 VALID_EXTENSIONS = {".pak", ".utoc", ".ucas"}
 
 for file_path in SOURCE_FOLDER.iterdir():
@@ -29,7 +24,7 @@ for file_path in SOURCE_FOLDER.iterdir():
 
     # Find the color
     color_found = None
-    for color in colors:
+    for color in COLORS:
         if f"_{color}_" in filename:
             
             color_found = color.capitalize()
