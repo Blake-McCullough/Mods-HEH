@@ -82,5 +82,5 @@ def reimport_all(path):
 
         # unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
 
-# reimport_all("/Game/Marvel")
-reimport_all("/") #reimport everything
+reimport_all("/Game/Marvel")
+reimport_all("/MarvelGAS/Marvel")
