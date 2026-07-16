@@ -130,21 +130,23 @@ def processThisColour(colour):
 # print("All files deleted.")
 
 # Loop through each first-level folder in ASSETLOCATION (e.g., 1021, 1022, etc.)
-for asset_folder in ASSETLOCATION.iterdir():
-    if not asset_folder.is_dir():
-        continue
-    
-    asset_id = asset_folder.name
-    print(f"Processing Asset ID: {asset_id}")
+for color_name in COLORS.keys():
+    print(f"Processing Colour: {color_name}")
 
-    colored_folder = asset_folder / "colored"
+    #go into each folder and copy out the image thing.
+    for asset_folder in ASSETLOCATION.iterdir():
+        if not asset_folder.is_dir():
+            continue
+        
+        asset_id = asset_folder.name
+        print(f"Processing Asset ID: {asset_id}")
 
-    if not colored_folder.exists():
-        print(f"Missing folder: {colored_folder}")
-        continue
+        colored_folder = asset_folder / "colored"
 
-    for color_name in COLORS.keys():
-        print(f"Processing Colour: {color_name}")
+        if not colored_folder.exists():
+            print(f"Missing folder: {colored_folder}")
+            continue
+
 
         source_folder = colored_folder / color_name
 
@@ -153,20 +155,20 @@ for asset_folder in ASSETLOCATION.iterdir():
             continue
 
         for file in source_folder.iterdir():
-            if file.is_file():
-                destination = asset_folder / file.name
+                if file.is_file():
+                    destination = asset_folder / file.name
 
-                print(f"  Copying {file.name}")
+                    print(f"  Copying {file.name}")
 
-                # Overwrites existing file automatically
-                shutil.copy2(file, destination)
-        
-        print(f"Copied Out All For the Colour: {color_name}")
+                    # Overwrites existing file automatically
+                    shutil.copy2(file, destination)
+            
+    print(f"Copied Out All For the Colour: {color_name}")
 
-        #Now we do the reimport and stuff.
-        processThisColour(color_name)
+            #Now we do the reimport and stuff.
+    processThisColour(color_name)
 
-        print(f"Processed the colour: {color_name}")
+    print(f"Processed the colour: {color_name}")
 
 
 
