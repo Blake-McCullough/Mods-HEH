@@ -4,7 +4,7 @@ import sys
 import os
 
 # Folder containing the .pak files
-SOURCE_FOLDER = Path(r"C:\Users\Blake\Desktop\RivalsMods\UI Mods\With Just Abilities\ScarletWitch UI")
+SOURCE_FOLDER = Path(r"C:\Users\Blake\Desktop\RivalsMods\UI Mods\With Just Abilities\ElsaBloodstone UI")
 
 # Add the current script's directory to Python path
 script_dir = os.path.dirname(os.path.abspath(__file__))

@@ -22,15 +22,15 @@ if script_dir not in sys.path:
 
 from SHAREDASSETS import COLORS
 
-name = "ScarletWitch"
+name = "ElsaBloodstone"
 #The pack id and then the name to use infront (will keep the ID)
 renames = {
     12: name,
     14: name + "_JustAbilities",
 }
 #The asset we want.
-ASSETLOCATION = Path(   
-    r"C:\Users\Blake\Documents\Unreal Projects\Marvel\Content\Marvel\UI\Textures\Ability\1038\Icon"
+ASSETLOCATION = Path(       
+    r"C:\Users\Blake\Documents\Unreal Projects\Marvel\Content\Marvel\UI\Textures\Ability\1059"
 )
 
         # fbx_file_path = import_data.get_first_filename()
